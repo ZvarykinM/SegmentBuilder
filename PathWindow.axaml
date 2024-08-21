@@ -1,0 +1,12 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="50" d:DesignHeight="200"
+        x:Class="SegmentBuilder.PathInputWindow"
+        Title="PathInput" Height="60" Width="200">
+    <Grid RowDefinitions="30,30">
+        <TextBox Name="PathInput" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="0"/>
+        <Button Click="Close" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Red" Foreground="White" Grid.Row="1">INPUT</Button>
+    </Grid>
+</Window>
