@@ -25,3 +25,6 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [/home/prolog/ForGitHub2/SegmentBuilder/PathWindow.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
+
+[/home/prolog/ForGitHub2/SegmentBuilder/SchemaWindow.axaml]
+build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml

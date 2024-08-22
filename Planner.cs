@@ -171,6 +171,8 @@ class ElementaryPlanner
 {
     private DataContext Ctx;
 
+    public DataContext GetCtx => Ctx;
+
     private Context Logic;
 
     private Solver Controller;

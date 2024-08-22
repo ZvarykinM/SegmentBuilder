@@ -130,3 +130,4 @@
 /home/prolog/ForGitHub2/SegmentBuilder/bin/Debug/net8.0/Microsoft.Z3.dll
 /home/prolog/ForGitHub2/SegmentBuilder/bin/Debug/net8.0/runtimes/osx-x64/native/libz3.dylib
 /home/prolog/ForGitHub2/SegmentBuilder/bin/Debug/net8.0/runtimes/win-x64/native/libz3.dll
+/home/prolog/ForGitHub2/SegmentBuilder/obj/Debug/net8.0/SegmentBuilder.sourcelink.json

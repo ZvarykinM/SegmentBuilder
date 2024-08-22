@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SegmentBuilder", "SegmentBuilder.csproj", "{BF660202-50E7-4861-9ECE-EBEC6CF2884D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SegmentBuilder", "SegmentBuilder.csproj", "{DD622FC1-E917-49E4-A967-EFF82DAA5264}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,10 +11,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{BF660202-50E7-4861-9ECE-EBEC6CF2884D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{BF660202-50E7-4861-9ECE-EBEC6CF2884D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{BF660202-50E7-4861-9ECE-EBEC6CF2884D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{BF660202-50E7-4861-9ECE-EBEC6CF2884D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD622FC1-E917-49E4-A967-EFF82DAA5264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD622FC1-E917-49E4-A967-EFF82DAA5264}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD622FC1-E917-49E4-A967-EFF82DAA5264}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD622FC1-E917-49E4-A967-EFF82DAA5264}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -14,7 +14,12 @@
                     <Separator/>
                     <MenuItem Header="_Exit" Click="Close"/>
                 </MenuItem>
-                <MenuItem Header="_ShowCalculated" Click="ShowCalculated">
+                <MenuItem Header="_Show">
+                    <MenuItem Name="Item0" Header="_ShowCalculated" Click="ShowCalculated"/>
+                    <Separator/>
+                    <MenuItem Name="Item1" Header="_ShowForF0" Click="ShowCalculated"/>
+                    <Separator/>
+                    <MenuItem Name="Item2" Header="_ShowForPath" Click="ShowCalculated"/>
                 </MenuItem>
             </Menu>
         <TextBlock/>
