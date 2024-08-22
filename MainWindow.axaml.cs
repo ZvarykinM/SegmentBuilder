@@ -112,6 +112,8 @@ public partial class MainWindow : Window
 
         public void DrawElementaryDiscreteIndex(ElementaryDiscreteIndex Index, string Param)
         {
+            ClearAll();
+            DrawPipeDesk();
             List<int[]> ConjugateIndexes = [];
             string flag1 = "", flag2 = "";
             (ConjugateIndexes, flag1, flag2) = Param switch
@@ -152,10 +154,11 @@ public partial class MainWindow : Window
         }
         Robot = new(Ctx, [19, 17]);
         GridPlot.Plot.Axes.SquareUnits();
+        Painter = new(GridPlot, Ctx, Robot);
         TestPainter = new(this.Find<AvaPlot>("GridPlot"), Robot.GetTestCtx, Robot);
-        TestPainter.DrawPipeDesk();
-        TestPainter.DrawSegment();
-        TestPainter.DrawPathConstraints();
+        // TestPainter.DrawPipeDesk();
+        // TestPainter.DrawSegment();
+        // TestPainter.DrawPathConstraints();
     }
 
     public void FileOpen(object sender, RoutedEventArgs e) => new PathInputWindow(){MainWin = this};
@@ -181,26 +184,30 @@ public partial class MainWindow : Window
         switch((sender as MenuItem).Name)
         {
             case "Item0":
-                P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 100));
+                P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 50));
                 Painter.Ctx = P.GetCtx;
                 Painter.DrawPipeDesk();
                 break;
             case "Item1":
-                _ = new SchemaWindow();
-                break;
-            case "Item2":
-                _ = new SchemaWindow();
+                P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 50));
+                TestPainter.Grid = new SchemaWindow(){MainWin = this}.GridPlot;
+                TestPainter.DrawPipeDesk();
+                TestPainter.DrawSegment();
                 break;
         }
     }
+
+    public void DrawHoseSegment(string Index)
+    {
+        Console.WriteLine(P is not null);
+        TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Hose");
+    }
+
+    public void DrawPathSegment(string Index) => TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Path");
 
     private static int[] StringToIndex(string Name)
     {
         var IndAsSubStrs = Name.Split(' ');
         return [Convert.ToInt32(IndAsSubStrs[0]), Convert.ToInt32(IndAsSubStrs[1])];
     }
-
-    public void DrawHoseSegment(object sender, RoutedEventArgs e) => Painter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.NameInCtx == CoordInput.Text), "Hose");
-
-    public void DrawPathSegment(object sender, RoutedEventArgs e) => Painter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.NameInCtx == CoordInput.Text), "Path");
 }

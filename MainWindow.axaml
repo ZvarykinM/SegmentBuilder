@@ -5,8 +5,8 @@
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="950"
         x:Class="SegmentBuilder.MainWindow"
         xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
-        Title="SegmentBuilder" Height="950" Width="900">
-    <Grid RowDefinitions="20,900,30">
+        Title="SegmentBuilder" Height="920" Width="900">
+    <Grid RowDefinitions="20,900">
         <DockPanel Grid.Row="0">
             <Menu DockPanel.Dock="Top">
                 <MenuItem Header="_File">
@@ -18,17 +18,10 @@
                     <MenuItem Name="Item0" Header="_ShowCalculated" Click="ShowCalculated"/>
                     <Separator/>
                     <MenuItem Name="Item1" Header="_ShowForF0" Click="ShowCalculated"/>
-                    <Separator/>
-                    <MenuItem Name="Item2" Header="_ShowForPath" Click="ShowCalculated"/>
                 </MenuItem>
             </Menu>
         <TextBlock/>
         </DockPanel>
         <ScottPlot:AvaPlot Name="GridPlot" Grid.Row="1"/>
-        <Grid ColumnDefinitions="300,300,300" Grid.Row="2">
-            <TextBox Name="CoordInput" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0"/>
-            <Button Click="DrawHoseSegment" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Red" Foreground="White" Grid.Column="1">ОЧИСТКА</Button>
-            <Button Click="DrawPathSegment" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Red" Foreground="White" Grid.Column="2">ПУТЬ</Button>
-        </Grid>
     </Grid>
 </Window>

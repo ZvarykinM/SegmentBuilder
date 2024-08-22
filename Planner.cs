@@ -130,8 +130,10 @@ class Planner
     }
 }
 
-class ElementaryDiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext SomeCtx, Context LogicCtx)
+class ElementaryDiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext SomeCtx, Context LogicCtx): IEquatable<string>
 {
+    public bool Equals(string SomeIndex) => NameInCtx == SomeIndex;
+
     private RobotModel Robot = SomeRobot;
 
     private int[] Index = IndexPair;
@@ -181,6 +183,7 @@ class ElementaryPlanner
 
     public List<ElementaryDiscreteIndex> GetIndexes => IndexesOfPipeDesk;
 
+    private BoolExpr CommonHoseConstr, CommonPathConstr, Goal;
     public ElementaryPlanner(DataContext SomeDataContext)
     {
         Ctx = SomeDataContext;
@@ -188,16 +191,20 @@ class ElementaryPlanner
         using(Logic = new())
         {
             Ctx.map.Values.ToList().ForEach(Pipe => IndexesOfPipeDesk.Add(new(Robot, Pipe.index, Ctx, Logic)));
-            var CommonHoseConstr = Logic.MkAnd(IndexesOfPipeDesk.ConvertAll(I => I.HoseConstr));
-            var CommonPathConstr = Logic.MkAnd(IndexesOfPipeDesk.ConvertAll(I => I.PathConstr));
-            var Goal = Logic.MkAtLeast(IndexesOfPipeDesk.ConvertAll(I => I.HExpr), 30);//Logic.MkEq(Logic.MkAnd(IndexesOfPipeDesk.ConvertAll(I => I.HExpr)), Logic.MkBool(true));
+            CommonHoseConstr = Logic.MkAnd(IndexesOfPipeDesk.ConvertAll(I => I.HoseConstr));
+            CommonPathConstr = Logic.MkAnd(IndexesOfPipeDesk.ConvertAll(I => I.PathConstr));
+            Goal = Logic.MkAtLeast(IndexesOfPipeDesk.ConvertAll(I => I.HExpr), 30);//Logic.MkEq(Logic.MkAnd(IndexesOfPipeDesk.ConvertAll(I => I.HExpr)), Logic.MkBool(true));
             Controller = Logic.MkSolver();
-            try
-            {
-                Controller.Add(Logic.MkAnd([CommonHoseConstr, CommonPathConstr, Goal]));
-                IndexesOfPipeDesk.ForEach(I => I.SetState(Controller));
-            }
-            catch{Console.WriteLine("МОДЕЛЬ НЕ СУЩЕСТВУЕТ");}
         }
+    }
+
+    public void SetVariableValues()
+    {
+        try
+        {
+            Controller.Add(Logic.MkAnd([CommonHoseConstr, CommonPathConstr, Goal]));
+            IndexesOfPipeDesk.ForEach(I => I.SetState(Controller));
+        }
+        catch{Console.WriteLine("МОДЕЛЬ НЕ СУЩЕСТВУЕТ");}
     }
 }

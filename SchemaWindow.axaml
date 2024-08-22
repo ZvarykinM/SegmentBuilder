@@ -2,9 +2,16 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="500"
+        mc:Ignorable="d" d:DesignWidth="630" d:DesignHeight="600"
         xmlns:ScottPlot="clr-namespace:ScottPlot.Avalonia;assembly=ScottPlot.Avalonia"
         x:Class="SegmentBuilder.SchemaWindow"
-        Title="SchemaInput" Height="500" Width="500">
-    <ScottPlot:AvaPlot Name="GridPlot"/>
+        Title="SchemaInput" Height="930" Width="900">
+    <Grid RowDefinitions="900,30">
+        <ScottPlot:AvaPlot Name="GridPlot" Grid.Row="0"/>
+        <Grid ColumnDefinitions="300,300,300" Grid.Row="1">
+            <TextBox Name="CoordInput" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Column="0"/>
+            <Button Click="DrawHoseSegment" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Blue" Foreground="White" Grid.Column="1">ОЧИСТКА</Button>
+            <Button Click="DrawPathSegment" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Blue" Foreground="White" Grid.Column="2">ПУТЬ</Button>
+        </Grid>
+    </Grid>
 </Window>
