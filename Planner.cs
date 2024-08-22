@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia.Media.TextFormatting;
 using DiscreteRobotImplementation;
 using Microsoft.Z3;
+using DiscreteRobotImplementation;
 
 namespace SegmentBuilder;
 
@@ -179,15 +180,20 @@ class ElementaryPlanner
 
     private Solver Controller;
 
+    private RobotModel Robot;
+
     private List<ElementaryDiscreteIndex> IndexesOfPipeDesk = [];
 
     public List<ElementaryDiscreteIndex> GetIndexes => IndexesOfPipeDesk;
 
     private BoolExpr CommonHoseConstr, CommonPathConstr, Goal;
+
+    public DataContext GetTestPipeConfiguration => Robot.GetTestCtx;
+
     public ElementaryPlanner(DataContext SomeDataContext)
     {
         Ctx = SomeDataContext;
-        var Robot = new RobotModel(Ctx, [20, 20]);
+        Robot = new RobotModel(Ctx, [20, 20]);
         using(Logic = new())
         {
             Ctx.map.Values.ToList().ForEach(Pipe => IndexesOfPipeDesk.Add(new(Robot, Pipe.index, Ctx, Logic)));

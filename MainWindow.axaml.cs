@@ -11,6 +11,8 @@ using System;
 using Avalonia.Interactivity;
 using Avalonia.Controls.ApplicationLifetimes;
 using System.Linq;
+using Microsoft.Z3;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SegmentBuilder;
 
@@ -44,8 +46,10 @@ public partial class MainWindow : Window
             C.LineColor = ScottPlot.Colors.Black;
             var Text = Grid.Plot.Add.Text(Name, PipeDescription.geom_coord[0], PipeDescription.geom_coord[1]);
             Text.LabelFontSize = 9;
-            PipeSchemas.Add(Name, C);
-            Labels.Add(Name, Text);
+            try{PipeSchemas.Add(Name, C);}
+            catch{PipeSchemas[Name] = C;}
+            try{Labels.Add(Name, Text);}
+            catch{Labels[Name] = Text;}
         }
 
         public void DrawPipeDesk()
@@ -112,8 +116,6 @@ public partial class MainWindow : Window
 
         public void DrawElementaryDiscreteIndex(ElementaryDiscreteIndex Index, string Param)
         {
-            ClearAll();
-            DrawPipeDesk();
             List<int[]> ConjugateIndexes = [];
             string flag1 = "", flag2 = "";
             (ConjugateIndexes, flag1, flag2) = Param switch
@@ -155,13 +157,13 @@ public partial class MainWindow : Window
         Robot = new(Ctx, [19, 17]);
         GridPlot.Plot.Axes.SquareUnits();
         Painter = new(GridPlot, Ctx, Robot);
-        TestPainter = new(this.Find<AvaPlot>("GridPlot"), Robot.GetTestCtx, Robot);
+        TestPainter = new(GridPlot, Robot.GetTestCtx, Robot);
         // TestPainter.DrawPipeDesk();
         // TestPainter.DrawSegment();
         // TestPainter.DrawPathConstraints();
     }
 
-    public void FileOpen(object sender, RoutedEventArgs e) => new PathInputWindow(){MainWin = this};
+    public void FileOpen(object sender, RoutedEventArgs e) => AllAuxiliaryWindows.Add(new PathInputWindow(){MainWin = this});
 
     public void Draw(object sender, RoutedEventArgs e)
     {
@@ -177,24 +179,22 @@ public partial class MainWindow : Window
         }
     }
 
-    public void Close(object sender, RoutedEventArgs e) => Close();
+    public void Close(object sender, RoutedEventArgs e)
+    {
+        AllAuxiliaryWindows.ForEach(W => {if(W is not null) W.Close();});
+        Close();
+    }
+
+    private List<Window> AllAuxiliaryWindows = [];
 
     public void ShowCalculated(object sender, RoutedEventArgs e)
     {
-        switch((sender as MenuItem).Name)
-        {
-            case "Item0":
-                P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 50));
-                Painter.Ctx = P.GetCtx;
-                Painter.DrawPipeDesk();
-                break;
-            case "Item1":
-                P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 50));
-                TestPainter.Grid = new SchemaWindow(){MainWin = this}.GridPlot;
-                TestPainter.DrawPipeDesk();
-                TestPainter.DrawSegment();
-                break;
-        }
+        P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 50));
+        AllAuxiliaryWindows.Add(new SchemaWindow(){MainWin = this});
+        TestPainter.Grid = (AllAuxiliaryWindows.Last() as SchemaWindow).GridPlot;
+        TestPainter.Ctx = P.GetCtx;
+        TestPainter.DrawPipeDesk();
+        if((sender as MenuItem).Name == "Item1") TestPainter.DrawSegment();
     }
 
     public void DrawHoseSegment(string Index)
