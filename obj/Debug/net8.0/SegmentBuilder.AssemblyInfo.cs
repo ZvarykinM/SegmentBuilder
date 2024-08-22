@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("SegmentBuilder")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+dfb4996581512321e53b6d220a621e79e7f56cb3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+78cc111b035d50165db0dc5eb5aea57125343a0b")]
 [assembly: System.Reflection.AssemblyProductAttribute("SegmentBuilder")]
 [assembly: System.Reflection.AssemblyTitleAttribute("SegmentBuilder")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

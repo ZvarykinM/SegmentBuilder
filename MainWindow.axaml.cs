@@ -129,7 +129,6 @@ public partial class MainWindow : Window
         }
     }
 
-
     private RobotModel Robot;
 
     private DataContext Ctx;
@@ -197,11 +196,7 @@ public partial class MainWindow : Window
         if((sender as MenuItem).Name == "Item1") TestPainter.DrawSegment();
     }
 
-    public void DrawHoseSegment(string Index)
-    {
-        Console.WriteLine(P is not null);
-        TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Hose");
-    }
+    public void DrawHoseSegment(string Index) => TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Hose");
 
     public void DrawPathSegment(string Index) => TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Path");
 
