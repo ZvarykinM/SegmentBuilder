@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Avalonia.Media.TextFormatting;
 using DiscreteRobotImplementation;
 using Microsoft.Z3;
-using DiscreteRobotImplementation;
 
 namespace SegmentBuilder;
 

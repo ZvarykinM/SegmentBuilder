@@ -14,13 +14,13 @@ namespace DiscreteRobotImplementation;
 
 class HoleState
 {
-    public string? state{get; set;}
+    public string state{get; set;}
 
-    public string? saved{get; set;}
+    public string saved{get; set;}
 
-    public int[]? index{get; set;}
+    public int[] index{get; set;}
 
-    public double[]? geom_coord{get;set;}
+    public double[] geom_coord{get;set;}
 
     public override string ToString() => $"\"state\":{state},\"saved\":{saved},\"index\":[{index[0]},{index[1]}],\"geom_coord\"[{geom_coord[0]},{geom_coord[1]}]";
 }
@@ -29,7 +29,7 @@ class FingerState
 {
     public bool valve{get; set;} //???
 
-    public double[]? position{get; set;}
+    public double[] position{get; set;}
 }
 
 class DataContext
@@ -40,11 +40,11 @@ class DataContext
 
     public double radius{get; set;}
 
-    public string? name{get; set;}
+    public string name{get; set;}
 
-    public Dictionary<string, HoleState>? map{get; set;}
+    public Dictionary<string, HoleState> map{get; set;}
 
-    public Dictionary<string, FingerState>? fingers{get; set;}    
+    public Dictionary<string, FingerState> fingers{get; set;}    
 }
 
 class DataContextForTestPipeDesk: DataContext

@@ -1,5 +1,6 @@
 using System;
 using Avalonia.Controls;
+using Avalonia.Input;
 using Avalonia.Interactivity;
 
 namespace SegmentBuilder;
@@ -11,6 +12,8 @@ public partial class PathInputWindow : Avalonia.Controls.Window
     public PathInputWindow()
     {
         InitializeComponent();
+        var topLevel = TopLevel.GetTopLevel(this);
+        topLevel.KeyDown += OnEnterKeyDown;
         Show();
     }
 
@@ -19,5 +22,10 @@ public partial class PathInputWindow : Avalonia.Controls.Window
         MainWin.Path = PathInput.Text ?? "КуАЭС";
         MainWin.Draw(this, new RoutedEventArgs());
         Close();
+    }
+
+    public void OnEnterKeyDown(object sender, KeyEventArgs e)
+    {
+        if(e.Key is Key.Enter) Close(sender, e);
     }
 }

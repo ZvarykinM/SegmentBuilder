@@ -11,6 +11,7 @@ using Avalonia.Win32;
 using System.Diagnostics;
 using Avalonia.Input.Raw;
 using System.Dynamic;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace SegmentBuilder;
 
@@ -69,7 +70,7 @@ class RobHand: ICloneable
 
     public static double dist2(Coord q0, Coord q1) => (q0 - q1).Norm;
     
-    public static Coord EvalLine(Line l, double t) => new Coord([l[1].X + t * l[0].X, l[1].Y + t * l[0].Y]);
+    public static Coord EvalLine(Line l, double t) => new([l[1].X + t * l[0].X, l[1].Y + t * l[0].Y]);
     
     public double AbsDistance => dist2(HandLine[1], EvalLine(HandLine, HandLen));
 
@@ -94,19 +95,14 @@ class RobState: ICloneable
 
     public void SetRobHand(RobHand H, string HandIndex)
     {
-        switch(HandIndex)
+        var i = HandIndex switch
         {
-            case "h0":
-                Hands[0] = H.Copy;
-                break;
-            case "h1":
-                Hands[1] = H.Copy;
-                break;
-            case "h":
-                Hands[2] = H.Copy;
-                break;
-            default: throw new Exception("НЕИЗВЕСТНЫЙ ИНДЕКС ПАЛЬЦА");
-        }
+            "h0" => 0,
+            "h1" => 1,
+            "h" => 2,
+            _ => throw new Exception("НЕИЗВЕСТНЫЙ ИНДЕКС ПАЛЬЦА")
+        };
+        Hands[i] = H.Copy;
     }
 
     public double Angle 
@@ -151,10 +147,8 @@ class RobState: ICloneable
                 var lh_max = l1_max + hy;
                 var lh_min = l1_min + hy;
                 return Hands[2].AbsDistance < lh_max && Hands[2].AbsDistance > lh_min;
-                break;
             case "F1":
                 return Hands[1].AbsDistance < l1_max && Hands[1].AbsDistance > l1_min;
-                break;
             case "F0F1":
                 var b1 = (Hands[1].AbsDistance < l1_max) && (Hands[1].AbsDistance > l1_min);
                 var b0 = (Hands[0].AbsDistance < l0_max) && (Hands[0].AbsDistance > l0_min);

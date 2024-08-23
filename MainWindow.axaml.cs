@@ -13,6 +13,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using System.Linq;
 using Microsoft.Z3;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Avalonia.Input;
 
 namespace SegmentBuilder;
 
@@ -65,21 +66,14 @@ public partial class MainWindow : Window
         private ScottPlot.Plottables.Ellipse IndexToCircle(int[] Index, string Param)
         {
             var C = Grid.Plot.Add.Circle(Index[0] * Ctx.step_x, Index[1] * Ctx.step_y, Ctx.radius);
-            switch(Param)
+            C.FillColor = Param switch
             {
-                case "HU":
-                    C.FillColor = ScottPlot.Colors.OrangeRed;
-                    break;
-                case "HL":
-                    C.FillColor = ScottPlot.Colors.OliveDrab;
-                    break;
-                case "F0":
-                    C.FillColor = ScottPlot.Colors.DarkBlue;
-                    break;
-                case "F2":
-                    C.FillColor = ScottPlot.Colors.DarkRed;
-                    break;
-            }
+                "HU" => ScottPlot.Colors.OrangeRed,
+                "HL" => ScottPlot.Colors.OliveDrab,
+                "F0" => ScottPlot.Colors.DarkBlue,
+                "F2" => ScottPlot.Colors.DarkRed,
+                _ => throw new Exception()
+            };
             return C;
         }
 
@@ -157,9 +151,16 @@ public partial class MainWindow : Window
         GridPlot.Plot.Axes.SquareUnits();
         Painter = new(GridPlot, Ctx, Robot);
         TestPainter = new(GridPlot, Robot.GetTestCtx, Robot);
+        TopLevel.GetTopLevel(this).KeyDown += OnEscKeyDown; 
         // TestPainter.DrawPipeDesk();
         // TestPainter.DrawSegment();
         // TestPainter.DrawPathConstraints();
+    }
+
+    public void OnEscKeyDown(object sender, KeyEventArgs e)
+    {
+        if(e.Key == Key.Escape)
+            Close();
     }
 
     public void FileOpen(object sender, RoutedEventArgs e) => AllAuxiliaryWindows.Add(new PathInputWindow(){MainWin = this});
