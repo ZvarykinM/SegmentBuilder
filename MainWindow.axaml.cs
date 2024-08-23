@@ -201,8 +201,7 @@ public partial class MainWindow : Window
 
     public void OnEscKeyDown(object sender, KeyEventArgs e)
     {
-        if(e.Key == Key.Escape)
-            Close();
+        if(e.Key == Key.Escape) Close(sender, e);
     }
 
     public void FileOpen(object sender, RoutedEventArgs e) => AllAuxiliaryWindows.Add(new PathInputWindow(){MainWin = this});
@@ -237,6 +236,7 @@ public partial class MainWindow : Window
         TestPainter.Ctx = P.GetCtx;
         TestPainter.DrawPipeDesk();
         if((sender as MenuItem).Name == "Item1") TestPainter.DrawSegment();
+        var PF = new PathFinder(Ctx); //здесь происходит главный расчёт
     }
 
     public void DrawHoseSegment(string Index)

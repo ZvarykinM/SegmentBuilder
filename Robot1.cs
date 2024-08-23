@@ -12,6 +12,8 @@ using System.Diagnostics;
 using Avalonia.Input.Raw;
 using System.Dynamic;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.Z3;
+using System.Formats.Tar;
 
 namespace SegmentBuilder;
 
@@ -288,15 +290,15 @@ class UnorientedRobotModel
 
     public bool CheckF0(int[] Index)
     {
-        int[] F2_Upper = [Index[0] - 1, Index[0] + 5], F2_Lower = [Index[0] + 1, Index[0] - 5];
+        int[] F2_Upper = [Index[0] - 1, Index[1] + 5], F2_Lower = [Index[0] + 1, Index[1] - 5];
         RobState SUpper = Inversion(F2_Upper, Index, H), SLower = Inversion(F2_Lower, Index, H);
-        return (SUpper is not null && SUpper.IsPossible/* && SUpper.AngleIsPossible1*/) || (SLower is not null && SLower.IsPossible);// && SLower.AngleIsPossible);
+        return (SUpper is not null && SUpper.IsPossible && SUpper.AngleIsPossible1) || (SLower is not null && SLower.IsPossible && SLower.AngleIsPossible);
     }
 
     public bool CheckH(int[] Index)
     {
         RobState SUpper = Inversion(F2_0, F0, Index), SLower = Inversion(F2_1, F0, Index);
-        return (SUpper is not null && SUpper.IsPossible/* && SUpper.AngleIsPossible1*/) || (SLower is not null && SLower.IsPossible);// && SLower.AngleIsPossible);
+        return (SUpper is not null && SUpper.IsPossible && SUpper.AngleIsPossible1) || (SLower is not null && SLower.IsPossible && SLower.AngleIsPossible);
     }
 
     public void Calculate(DataContext SomeCtx, int[] StartPos)
@@ -319,5 +321,76 @@ class UnorientedRobotModel
         Positions.ForEach(I => Res.Add([I[0] + Index[0], I[1] + Index[1]]));
         return Res.Select(I => $"{I[0]}_{I[1]}").Where(S => Ctx.map.ContainsKey(S) && Ctx.map[S].state != "Inaccessible").Select(S => S.Split('_')
                   .Select(n => Convert.ToInt32(n)).ToArray()).ToList();
+    }
+}
+
+class IndexCover
+{
+    private readonly Context Ctx;
+
+    private readonly UnorientedRobotModel Robot;
+
+    private int[] Index;
+
+    public IndexCover(UnorientedRobotModel SomeRobot, Context Logic, int[] SomeIndexPair) => (Ctx, Robot, IndexPair) = (Logic, SomeRobot, SomeIndexPair);
+
+    private List<int[]> ConjugateIndexes(int[] SomeIndex, string arg) => Robot.FindPositionsForCurrIndex(SomeIndex, arg);
+
+    private List<BoolExpr> ConjugateHVars = [], ConjugateFVars = [];
+
+    public int[] IndexPair
+    {
+        get => Index;
+        set
+        {
+            Index = value;
+            ConjugateHVars = ConjugateIndexes(Index, "Hose").ConvertAll(I => Ctx.MkBoolConst($"H{I[0]}_{I[1]}"));
+            ConjugateFVars = ConjugateIndexes(Index, "Path").ConvertAll(I => Ctx.MkBoolConst($"F{I[0]}_{I[1]}"));
+        }
+    }
+
+    public string Name => $"{Index[0]}_{Index[1]}";
+
+    public BoolExpr FExpr => Ctx.MkBoolConst("F" + Name);
+
+    public BoolExpr HExpr => Ctx.MkBoolConst("H" + Name);
+
+    public BoolExpr PathConstr => Ctx.MkImplies(HExpr, Ctx.MkAtLeast(ConjugateFVars, 1));
+
+    public BoolExpr HoseConstr => Ctx.MkImplies(FExpr, Ctx.MkAnd(ConjugateHVars));
+
+    private bool HValue, FValue;
+
+    public void SetValues(Solver Calculator) => 
+        (HValue, FValue) = (Calculator.Model.Evaluate(HExpr).ToString() == "true", Calculator.Model.Evaluate(FExpr).ToString() == "true");
+
+    public bool GetHValue => HValue;
+
+    public bool GetFValue => FValue;
+}
+
+class PathFinder
+{
+    private readonly Context Ctx;
+
+    private readonly DataContext DataCtx;
+
+    public List<IndexCover> Indexes;
+
+    public PathFinder(DataContext SomeDataContext)
+    {
+        DataCtx = SomeDataContext;
+        using(Ctx = new())
+        {
+            var Robot = new UnorientedRobotModel();
+            Robot.Calculate(DataCtx, [19, 17]);
+            Indexes = DataCtx.map.Values.ToList().ConvertAll(V => new IndexCover(Robot, Ctx, V.index));
+            var CommonPathConstr = Ctx.MkAnd(Indexes.ConvertAll(I => I.PathConstr));
+            var CommonHoseConstr = Ctx.MkAnd(Indexes.ConvertAll(I => I.HoseConstr));
+            var Goal = Ctx.MkAnd(Indexes.ConvertAll(I => I.HExpr));
+            var Calc = Ctx.MkSolver();
+            Calc.Add(Ctx.MkAnd([CommonPathConstr, CommonHoseConstr, Goal]));
+            Indexes.ForEach(I => I.SetValues(Calc));
+        }
     }
 }

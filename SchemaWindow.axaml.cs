@@ -50,6 +50,10 @@ public partial class SchemaWindow : Avalonia.Controls.Window
         }
         // if(e.Key is Key.Left) MainWin.ClearCommonSchema("Hose");
         // else if(e.Key is Key.Down) MainWin.ClearCommonSchema("Path");
-        
+    }
+
+    public void Info(object sender, RoutedEventArgs e)
+    {
+
     }
 }
