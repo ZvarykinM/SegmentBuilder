@@ -278,7 +278,7 @@ class UnorientedRobotModel
         return Inversion02(XY2, XY0, F1);
     }
 
-    protected DataContext Ctx;
+    public DataContext Ctx;
     
     public List<int[]> HoseArray = [], PathArray = []; //HoseArray - для хранения H-переменных, сопряжённых с заданной; PathArray - для хранения F-переменных
 
@@ -290,18 +290,18 @@ class UnorientedRobotModel
     {
         int[] F2_Upper = [Index[0] - 1, Index[0] + 5], F2_Lower = [Index[0] + 1, Index[0] - 5];
         RobState SUpper = Inversion(F2_Upper, Index, H), SLower = Inversion(F2_Lower, Index, H);
-        return (SUpper is not null && SUpper.IsPossible && SUpper.AngleIsPossible1) || (SLower is not null && SLower.IsPossible && SLower.AngleIsPossible);
+        return (SUpper is not null && SUpper.IsPossible/* && SUpper.AngleIsPossible1*/) || (SLower is not null && SLower.IsPossible);// && SLower.AngleIsPossible);
     }
 
     public bool CheckH(int[] Index)
     {
         RobState SUpper = Inversion(F2_0, F0, Index), SLower = Inversion(F2_1, F0, Index);
-        return (SUpper is not null && SUpper.IsPossible && SUpper.AngleIsPossible1) || (SLower is not null && SLower.IsPossible && SLower.AngleIsPossible);
+        return (SUpper is not null && SUpper.IsPossible/* && SUpper.AngleIsPossible1*/) || (SLower is not null && SLower.IsPossible);// && SLower.AngleIsPossible);
     }
 
     public void Calculate(DataContext SomeCtx, int[] StartPos)
     {
-        (Ctx, F0, F2_0, F2_1, H) = (SomeCtx, StartPos, [F0[0] - 1, F0[1] + 5], [F0[0] + 1, F0[1] - 5], StartPos);
+        (Ctx, F0, F2_0, F2_1, H) = (SomeCtx, StartPos, [StartPos[0] - 1, StartPos[1] + 5], [StartPos[0] + 1, StartPos[1] - 5], StartPos);
         TestData = new DataContextForTestPipeDesk(Ctx, 50);
         TestData.map.Values.ToList().ConvertAll(V => V.index).FindAll(CheckH).ForEach(I => HoseArray.Add([I[0] - F0[0], I[1] - F0[1]]));
         TestData.map.Values.ToList().ConvertAll(V => V.index).FindAll(CheckF0).ForEach(I => PathArray.Add([I[0] - F0[0], I[1] - F0[1]]));

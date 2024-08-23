@@ -7,6 +7,6 @@
         Title="PathInput" Height="60" Width="200">
     <Grid RowDefinitions="30,30">
         <TextBox Name="PathInput" HorizontalAlignment="Stretch" VerticalAlignment="Center" Grid.Row="0"/>
-        <Button Click="Close" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Red" Foreground="White" Grid.Row="1">INPUT</Button>
+        <Button Name="InputButton" Click="Close" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Red" Foreground="White" Grid.Row="1">INPUT</Button>
     </Grid>
 </Window>

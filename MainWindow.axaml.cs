@@ -51,12 +51,14 @@ public partial class MainWindow : Window
             catch{PipeSchemas[Name] = C;}
             try{Labels.Add(Name, Text);}
             catch{Labels[Name] = Text;}
+            Grid.Refresh();
         }
 
         public void DrawPipeDesk()
         {
             foreach(var p in  Ctx.map)
                 DrawPipe(p.Key, p.Value);
+            Grid.Refresh();
         }
 
         private List<ScottPlot.Plottables.Ellipse> HSegment = [];
@@ -120,10 +122,48 @@ public partial class MainWindow : Window
             };
             ConjugateIndexes.ForEach(I => ForCurrElementaryDiscreteIndex.Add(IndexToCircle(I, flag2)));
             ForCurrElementaryDiscreteIndex.Add(IndexToCircle(Robot.GetF0, flag1));
+            Grid.Refresh();
+        }
+
+        private List<ScottPlot.Plottables.Ellipse> CommonHoseSchema = [], CommonPathSchema = [];
+
+        public void DrawCommonHoseSchema(List<int[]> HosePipes, int[] Index)
+        {
+            CommonHoseSchema.ForEach(Grid.Plot.Remove);
+            CommonHoseSchema.Clear();
+            HosePipes.ForEach(I => CommonHoseSchema.Add(IndexToCircle(I, "HL")));
+            CommonHoseSchema.Add(IndexToCircle(Index, "F0"));
+            Grid.Refresh();
+        }
+
+        public void DrawCommonPathSchema(List<int[]> PathPipes, int[] Index)
+        {
+            CommonPathSchema.ForEach(Grid.Plot.Remove);
+            CommonPathSchema.Clear();
+            PathPipes.ForEach(I => CommonPathSchema.Add(IndexToCircle(I, "F0")));
+            CommonPathSchema.Add(IndexToCircle(Index, "HL"));
+            Grid.Refresh();
+        }
+
+        public void ClearCommon(string arg)
+        {
+            if(arg == "Hose")
+            {
+                CommonHoseSchema.ForEach(Grid.Plot.Remove);
+                CommonHoseSchema.Clear();
+            }
+            else if(arg == "Path")
+            {
+                CommonPathSchema.ForEach(Grid.Plot.Remove);
+                CommonPathSchema.Clear();
+            }
+            Grid.Refresh();
         }
     }
 
     private RobotModel Robot;
+
+    private UnorientedRobotModel URobot;
 
     private DataContext Ctx;
 
@@ -148,6 +188,8 @@ public partial class MainWindow : Window
             Ctx = JsonSerializer.Deserialize<DataContext>(S.ReadToEnd());
         }
         Robot = new(Ctx, [19, 17]);
+        URobot = new();
+        URobot.Calculate(Ctx, [19, 17]);
         GridPlot.Plot.Axes.SquareUnits();
         Painter = new(GridPlot, Ctx, Robot);
         TestPainter = new(GridPlot, Robot.GetTestCtx, Robot);
@@ -197,9 +239,33 @@ public partial class MainWindow : Window
         if((sender as MenuItem).Name == "Item1") TestPainter.DrawSegment();
     }
 
-    public void DrawHoseSegment(string Index) => TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Hose");
+    public void DrawHoseSegment(string Index)
+    {
+        try{TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Hose");}
+        catch{}
+    }
 
-    public void DrawPathSegment(string Index) => TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Path");
+    public void DrawPathSegment(string Index)
+    {
+        try{TestPainter.DrawElementaryDiscreteIndex(P.GetIndexes.Find(I => I.Equals(Index)), "Path");}
+        catch{}
+    }
+
+    public void DrawCommonHose(string Index)
+    {
+        URobot = new();
+        URobot.Calculate(Robot.GetTestCtx, [19, 17]);
+        TestPainter.DrawCommonHoseSchema(URobot.FindPositionsForCurrIndex(StringToIndex(Index), "Hose"), StringToIndex(Index));
+    }
+
+    public void DrawCommonPath(string Index)
+    {
+        URobot = new();
+        URobot.Calculate(Robot.GetTestCtx, [19, 17]);
+        TestPainter.DrawCommonPathSchema(URobot.FindPositionsForCurrIndex(StringToIndex(Index), "Path"), StringToIndex(Index));
+    }
+
+    public void ClearCommonSchema(string arg) => TestPainter.ClearCommon(arg);
 
     private static int[] StringToIndex(string Name)
     {
