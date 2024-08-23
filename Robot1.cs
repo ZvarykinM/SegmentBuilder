@@ -317,10 +317,7 @@ class UnorientedRobotModel
             _ => throw new Exception("НЕИЗВЕСТНЫЙ ПАРАМЕТР ВЫБОРА"),
         };
         Positions.ForEach(I => Res.Add([I[0] + Index[0], I[1] + Index[1]]));
-        return Res.Select(I => $"{I[0]}_{I[1]}")
-                  .Where(S => Ctx.map.Keys.Contains(S) && Ctx.map[S].state != "Inaccessible").Select(S => S.Split('_')
-                  .Select(n => Convert.ToInt32(n))
-                  .ToArray())
-                  .ToList();
+        return Res.Select(I => $"{I[0]}_{I[1]}").Where(S => Ctx.map.ContainsKey(S) && Ctx.map[S].state != "Inaccessible").Select(S => S.Split('_')
+                  .Select(n => Convert.ToInt32(n)).ToArray()).ToList();
     }
 }
