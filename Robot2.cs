@@ -16,7 +16,6 @@ namespace SegmentBuilder;
 
 class RobotModel : UnorientedRobotModel
 {
-
     private int[] DefaultF0, DefaultF2Upper, DefaultF2Lower, DefaultH;
 
     public int[] GetF0 => DefaultF0;
@@ -31,23 +30,14 @@ class RobotModel : UnorientedRobotModel
 
     public List<int[]> GetIndexes(int[] Point, string Param)
     {
-        List<int[]> IndexesArray = [];
-        switch(Param)
+        List<int[]> IndexesArray = Param switch
         {
-            case "HUpper":
-                IndexesArray = HIndexesUpper;
-                break;
-            case "HLower":
-                IndexesArray = HIndexesLower;
-                break;
-            case "F0Upper":
-                IndexesArray = F0IndexesUpper;
-                break;
-            case "F0Lower":
-                IndexesArray = F0IndexesLower;
-                break;
-            default: throw new Exception("НЕИЗВЕСТНОЕ ЗНАЧЕНИЕ ПАРАМЕТРА ВЫБОРА");
-        }
+            "HUpper" => HIndexesUpper,
+            "HLower" => HIndexesLower,
+            "F0Upper" => F0IndexesUpper,
+            "F0Lower" => F0IndexesLower,
+            _ => throw new Exception("НЕИЗВЕСТНОЕ ЗНАЧЕНИЕ ПАРАМЕТРА ВЫБОРА"),
+        };
         var Res = new List<int[]>();
         IndexesArray.ForEach(I => Res.Add([I[0] - DefaultF0[0] + Point[0], I[1] - DefaultF0[1] + Point[1]]));
         return Res.FindAll(I => {var Name = $"{I[0]}_{I[1]}"; return Ctx.map.Keys.ToList().Contains(Name) && Ctx.map[Name].state != "Inaccessible";});

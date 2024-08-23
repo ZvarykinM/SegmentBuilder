@@ -8,11 +8,11 @@ namespace SegmentBuilder;
 
 class DiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext SomeCtx, Context LogicCtx)
 {
-    private RobotModel Robot = SomeRobot;
+    private readonly RobotModel Robot = SomeRobot;
 
-    private int[] Index = IndexPair;
+    private readonly int[] Index = IndexPair;
 
-    private DataContext Ctx = SomeCtx;
+    private readonly DataContext Ctx = SomeCtx;
 
     private Context Logic = LogicCtx;
 
@@ -27,28 +27,14 @@ class DiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext SomeCtx, 
     private List<BoolExpr> GenerateConstraintVariables(string Param)
     {
         var HIndexes = new List<int[]>();
-        List<int[]> CountedHIndexes;
-        string Name = "";
-        switch(Param)
+        (List<int[]> CountedHIndexes, string Name) = Param switch
         {
-            case "H_Upper":   //для вызова в качестве fi_u
-                CountedHIndexes = Robot.HIndexesUpper;
-                Name = "H";
-                break;
-            case "H_Lower":   //для вызова в качестве fi_l
-                CountedHIndexes = Robot.HIndexesLower;
-                Name = "H";
-                break;
-            case "F0_Lower":  //для вызова в качестве fi_u_^{-1}
-                CountedHIndexes = Robot.F0IndexesLower;
-                Name = "FL";
-                break;
-            case "F0_Upper":  //для вызова в качестве fi_l_^{-1}
-                CountedHIndexes = Robot.F0IndexesUpper;
-                Name = "FU";
-                break;
-            default: throw new Exception("НЕИЗВЕСТНЫЙ ПАРАМЕТР ВЫБОРА");
-        }
+            "H_Upper" => (Robot.HIndexesUpper, "H"),   //для вызова в качестве fi_u
+            "H_Lower" => (Robot.HIndexesLower, "H"), //для вызова в качестве fi_l
+            "F0_Lower" => (Robot.F0IndexesLower, "FL"),  //для вызова в качестве fi_u_^{-1}
+            "F0_Upper" => (Robot.F0IndexesUpper, "FU"),  //для вызова в качестве fi_l_^{-1}
+            _ => throw new Exception("НЕИЗВЕСТНЫЙ ПАРАМЕТР ВЫБОРА")
+        };
         CountedHIndexes.ForEach(I => HIndexes.Add([I[0] - Robot.GetF0[0] + Index[0], I[1] - Robot.GetF0[1] + Index[1]]));
         var Buffer = HIndexes.ConvertAll(I => $"{I[0]}_{I[1]}").FindAll(Name => Ctx.map.Keys.ToList().Contains(Name) && Ctx.map[Name].state != "Inaccessible");
         return Buffer.ConvertAll(I => Logic.MkBoolConst(Name + I));
@@ -63,7 +49,7 @@ class DiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext SomeCtx, 
         get
         {
             var HVars = GenerateConstraintVariables("F0_Lower");
-            //HVars.AddRange(GenerateConstraintVariables("F0_Upper"));
+            HVars.AddRange(GenerateConstraintVariables("F0_Upper"));
             return Logic.MkImplies(HExpression, Logic.MkAtLeast(HVars, 1));
         }
     }
@@ -72,22 +58,19 @@ class DiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext SomeCtx, 
 
     public bool FU_IsCorrect
     {
-        private set => FUVal = value;
-
+        private set => FUVal = value; 
         get => FUVal;
     }
 
     public bool FL_IsCorrect
     {
         private set => FLVal = value;
-
         get => FLVal;
     }
 
     public bool H_IsCorrect
     {
         private set => HVal = value;
-
         get => HVal;
     }
 
@@ -100,11 +83,11 @@ class DiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext SomeCtx, 
 
 class Planner
 {
-    private DataContext Ctx;
+    private readonly DataContext Ctx;
 
-    private Context Logic;
+    private readonly Context Logic;
 
-    private Solver Controller;
+    private readonly Solver Controller;
 
     private List<DiscreteIndex> IndexesOfPipeDesk = [];
 
@@ -170,21 +153,23 @@ class ElementaryDiscreteIndex(RobotModel SomeRobot, int[] IndexPair, DataContext
 
 class ElementaryPlanner
 {
-    private DataContext Ctx;
+    private readonly DataContext Ctx;
 
     public DataContext GetCtx => Ctx;
 
-    private Context Logic;
+    private readonly Context Logic;
 
-    private Solver Controller;
+    private readonly Solver Controller;
 
-    private RobotModel Robot;
+    private readonly RobotModel Robot;
 
-    private List<ElementaryDiscreteIndex> IndexesOfPipeDesk = [];
+    private readonly List<ElementaryDiscreteIndex> IndexesOfPipeDesk = [];
 
     public List<ElementaryDiscreteIndex> GetIndexes => IndexesOfPipeDesk;
 
-    private BoolExpr CommonHoseConstr, CommonPathConstr, Goal;
+    private readonly BoolExpr CommonHoseConstr;
+    private readonly BoolExpr CommonPathConstr;
+    private readonly BoolExpr Goal;
 
     public DataContext GetTestPipeConfiguration => Robot.GetTestCtx;
 

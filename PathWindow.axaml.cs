@@ -12,8 +12,7 @@ public partial class PathInputWindow : Avalonia.Controls.Window
     public PathInputWindow()
     {
         InitializeComponent();
-        var topLevel = TopLevel.GetTopLevel(this);
-        topLevel.KeyDown += OnEnterKeyDown;
+        TopLevel.GetTopLevel(this).KeyDown += OnEnterKeyDown;
         Show();
     }
 
