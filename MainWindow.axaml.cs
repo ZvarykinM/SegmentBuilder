@@ -4,15 +4,10 @@ using System.IO;
 using System.Text.Json;
 using ScottPlot.Avalonia;
 using System.Collections.Generic;
-using System.Drawing;
 using KVP = System.Collections.Generic.KeyValuePair<string, ScottPlot.Color>;
-using System.IO.Pipelines;
 using System;
 using Avalonia.Interactivity;
-using Avalonia.Controls.ApplicationLifetimes;
 using System.Linq;
-using Microsoft.Z3;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Avalonia.Input;
 using System.Timers;
 
