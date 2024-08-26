@@ -14,6 +14,7 @@ using System.Linq;
 using Microsoft.Z3;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Avalonia.Input;
+using System.Timers;
 
 namespace SegmentBuilder;
 
@@ -159,6 +160,35 @@ public partial class MainWindow : Window
             }
             Grid.Refresh();
         }
+
+        private ScottPlot.Plottables.Ellipse DrawPipeSchema(int[] PipeIndex)
+        {
+            var C = Grid.Plot.Add.Circle(Ctx.step_x * PipeIndex[0], Ctx.step_y * PipeIndex[1], Ctx.radius);
+            var S = Ctx.map[$"{PipeIndex[0]}_{PipeIndex[1]}"].state;
+            if(S != "Inaccessible")
+            {
+                if(S != "Finger") C.FillColor = ScottPlot.Colors.Purple;
+                else C.FillColor = ScottPlot.Colors.DarkBlue;
+            }
+            return C;
+        }
+
+        private List<ScottPlot.Plottables.Ellipse> PartialSchemas = [];
+
+        public void ClearPartialSchemas()
+        {
+            PartialSchemas.ForEach(PS => Grid.Plot.Remove(PS));
+            Grid.Refresh();
+            PartialSchemas.Clear();
+        }
+
+        public void DrawPipe(KeyValuePair<int[], List<int[]>> Pipe)
+        {
+            PartialSchemas.AddRange(Pipe.Value.ConvertAll(I => DrawPipeSchema(I)));
+            PartialSchemas.Add(DrawPipeSchema(Pipe.Key));
+            Grid.Refresh();
+        }
+
     }
 
     private RobotModel Robot;
@@ -193,7 +223,8 @@ public partial class MainWindow : Window
         GridPlot.Plot.Axes.SquareUnits();
         Painter = new(GridPlot, Ctx, Robot);
         TestPainter = new(GridPlot, Robot.GetTestCtx, Robot);
-        TopLevel.GetTopLevel(this).KeyDown += OnEscKeyDown; 
+        TopLevel.GetTopLevel(this).KeyDown += OnEscKeyDown;
+        TopLevel.GetTopLevel(this).KeyDown += ShowCurrPipeHoseable;
         // TestPainter.DrawPipeDesk();
         // TestPainter.DrawSegment();
         // TestPainter.DrawPathConstraints();
@@ -228,15 +259,56 @@ public partial class MainWindow : Window
 
     private List<Window> AllAuxiliaryWindows = [];
 
+    private SecondPlanner PF;
+
     public void ShowCalculated(object sender, RoutedEventArgs e)
     {
-        P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 50));
-        AllAuxiliaryWindows.Add(new SchemaWindow(){MainWin = this});
-        TestPainter.Grid = (AllAuxiliaryWindows.Last() as SchemaWindow).GridPlot;
-        TestPainter.Ctx = P.GetCtx;
-        TestPainter.DrawPipeDesk();
-        if((sender as MenuItem).Name == "Item1") TestPainter.DrawSegment();
-        var PF = new PathFinder(Ctx); //здесь происходит главный расчёт
+        // P = new ElementaryPlanner(new DataContextForTestPipeDesk(Ctx, 50));
+        // AllAuxiliaryWindows.Add(new SchemaWindow(){MainWin = this});
+        // TestPainter.Grid = (AllAuxiliaryWindows.Last() as SchemaWindow).GridPlot;
+        // TestPainter.Ctx = P.GetCtx;
+        // TestPainter.DrawPipeDesk();
+        // if((sender as MenuItem).Name == "Item1") TestPainter.DrawSegment();
+        //var PF = new PathFinder(Ctx, 500); //здесь происходит главный расчёт
+        PF = new(SomeGridModel: new(Ctx));
+        PF.Solve(Convert.ToUInt32(Ctx.map.Keys.Count) / 3);
+    }
+
+    private System.Timers.Timer ATimer;
+
+    private int IteratorForPartialDraw = 0;
+
+    private void InitializeTimer(int TimeOffset = 1000)
+    {
+        ATimer = new(TimeOffset);
+        ATimer.Elapsed += OnTimedEvent;
+        ATimer.AutoReset = true;
+        ATimer.Enabled = true;
+    }
+
+    private void OnTimedEvent(object sender, ElapsedEventArgs e) => DrawCurrPipeHoseable();
+
+    public void ShowPartialCalculated(object sender, RoutedEventArgs e)
+    {
+        InitializeTimer();
+        // foreach(var p in PF.HoseIndexesPhiFunc)
+        //     Painter.DrawPipe(p);
+    }
+
+    public void ShowCurrPipeHoseable(object sender, KeyEventArgs e)
+    {
+        if(e.Key == Key.Up) DrawCurrPipeHoseable();
+    }
+
+    private void DrawCurrPipeHoseable()
+    {
+         if(IteratorForPartialDraw == PF.HoseIndexesPhiFunc.Count)
+        {
+            IteratorForPartialDraw = 0;
+            Painter.ClearPartialSchemas();
+        }
+        Painter.DrawPipe(PF.HoseIndexesPhiFunc.ToList()[IteratorForPartialDraw]);
+        IteratorForPartialDraw++;
     }
 
     public void DrawHoseSegment(string Index)

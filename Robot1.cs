@@ -377,7 +377,7 @@ class PathFinder
 
     public List<IndexCover> Indexes;
 
-    public PathFinder(DataContext SomeDataContext)
+    public PathFinder(DataContext SomeDataContext, uint K)
     {
         DataCtx = SomeDataContext;
         using(Ctx = new())
@@ -387,9 +387,11 @@ class PathFinder
             Indexes = DataCtx.map.Values.ToList().ConvertAll(V => new IndexCover(Robot, Ctx, V.index));
             var CommonPathConstr = Ctx.MkAnd(Indexes.ConvertAll(I => I.PathConstr));
             var CommonHoseConstr = Ctx.MkAnd(Indexes.ConvertAll(I => I.HoseConstr));
-            var Goal = Ctx.MkAnd(Indexes.ConvertAll(I => I.HExpr));
+            var Goal = Ctx.MkAtLeast(Indexes.ConvertAll(I => I.HExpr), 1);
+            var Goal1 = Ctx.MkAtLeast(Indexes.ConvertAll(I => I.FExpr), K);
             var Calc = Ctx.MkSolver();
-            Calc.Add(Ctx.MkAnd([CommonPathConstr, CommonHoseConstr, Goal]));
+            Calc.Add(Ctx.MkAnd([CommonPathConstr, CommonHoseConstr, Goal1]));
+            Console.WriteLine($"{Calc.Check()}");
             Indexes.ForEach(I => I.SetValues(Calc));
         }
     }

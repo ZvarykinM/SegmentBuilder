@@ -18,6 +18,8 @@
                     <MenuItem Name="Item0" Header="_ShowCalculated" Click="ShowCalculated"/>
                     <Separator/>
                     <MenuItem Name="Item1" Header="_ShowForF0" Click="ShowCalculated"/>
+                    <Separator/>
+                    <MenuItem Name="Item2" Header="_ShowForAll" Click="ShowPartialCalculated"/>
                 </MenuItem>
             </Menu>
         <TextBlock/>
